@@ -207,7 +207,7 @@ class TestRestApiImporter(TestCase):
         qs = Organization.objects.all()
         # also created parent organization
         self.assertQuerysetEqual(
-            qs, [repr(organization.parent), repr(organization)], ordered=False
+            qs, [organization.parent, organization], ordered=False
         )
         self.assertEqual(organization.name, "Organization-1")
         self.assertNotEqual(organization.id, 111)
@@ -218,7 +218,7 @@ class TestRestApiImporter(TestCase):
     def test_import_organization_without_parent(self):
         organization = self.importer._import_organization(organization_2)
         qs = Organization.objects.all()
-        self.assertQuerysetEqual(qs, [repr(organization)])
+        self.assertQuerysetEqual(qs, [organization])
         self.assertEqual(organization.name, "Organization-2")
         self.assertNotEqual(organization.id, 222)
 
@@ -228,7 +228,7 @@ class TestRestApiImporter(TestCase):
         qs = Organization.objects.all()
         # also created parent organization
         self.assertQuerysetEqual(
-            qs, [repr(organization.parent), repr(organization)], ordered=False
+            qs, [organization.parent, organization], ordered=False
         )
         self.assertEqual(organization.name, "Organization-1")
         self.assertNotEqual(organization.id, 111)
@@ -245,7 +245,7 @@ class TestRestApiImporter(TestCase):
         organization = importer._import_organization(changed_organization)
         # Now the parents should have switched.
         self.assertQuerysetEqual(
-            qs, [repr(organization.parent), repr(organization)], ordered=False
+            qs, [organization.parent, organization], ordered=False
         )
         self.assertEqual(organization.name, "Organization-2")
         self.assertNotEqual(organization.id, 222)
@@ -266,7 +266,7 @@ class TestRestApiImporter(TestCase):
         self.importer._import_organization(organization_2)
         organization.refresh_from_db()
 
-        self.assertQuerysetEqual(Organization.objects.all(), [repr(organization)])
+        self.assertQuerysetEqual(Organization.objects.all(), [organization])
         self.assertEqual(organization.name, "Organization-2")
 
     @patch("requests.get", MagicMock(side_effect=mock_request_get))
@@ -285,7 +285,7 @@ class TestRestApiImporter(TestCase):
         data_source = self.importer._import_data_source("test-data-source")
         data_source_model = get_data_source_model()
         qs = data_source_model.objects.all()
-        self.assertQuerysetEqual(qs, [repr(data_source)])
+        self.assertQuerysetEqual(qs, [data_source])
         self.assertEqual(data_source.id, "test-data-source")
 
     def test_import_data_source_with_dict_data(self):
@@ -293,7 +293,7 @@ class TestRestApiImporter(TestCase):
         data_source = self.importer._import_data_source(data)
         data_source_model = get_data_source_model()
         qs = data_source_model.objects.all()
-        self.assertQuerysetEqual(qs, [repr(data_source)])
+        self.assertQuerysetEqual(qs, [data_source])
         self.assertEqual(data_source.id, "test-data-source")
 
     def test_import_organization_class_with_string(self):
@@ -301,7 +301,7 @@ class TestRestApiImporter(TestCase):
             "test-source-1:test-org-class"
         )
         qs = OrganizationClass.objects.all()
-        self.assertQuerysetEqual(qs, [repr(organization_class)])
+        self.assertQuerysetEqual(qs, [organization_class])
         self.assertEqual(organization_class.id, "test-source-1:test-org-class")
         self.assertEqual(organization_class.name, "test-source-1:test-org-class")
 
@@ -310,7 +310,7 @@ class TestRestApiImporter(TestCase):
             "class-with-no-source"
         )
         qs = OrganizationClass.objects.all()
-        self.assertQuerysetEqual(qs, [repr(organization_class)])
+        self.assertQuerysetEqual(qs, [organization_class])
         self.assertEqual(organization_class.id, "OpenDecisionAPI:class-with-no-source")
         self.assertEqual(
             organization_class.name, "OpenDecisionAPI:class-with-no-source"
@@ -326,7 +326,7 @@ class TestRestApiImporter(TestCase):
         )
 
         qs = OrganizationClass.objects.all()
-        self.assertQuerysetEqual(qs, [repr(organization_class)])
+        self.assertQuerysetEqual(qs, [organization_class])
         self.assertEqual(organization_class.id, "remapped:class-with-no-source")
         self.assertEqual(organization_class.name, "remapped:class-with-no-source")
 
@@ -339,7 +339,7 @@ class TestRestApiImporter(TestCase):
         }
         organization_class = self.importer._import_organization_class(data)
         qs = OrganizationClass.objects.all()
-        self.assertQuerysetEqual(qs, [repr(organization_class)])
+        self.assertQuerysetEqual(qs, [organization_class])
         self.assertEqual(organization_class.name, "test-org-class")
         self.assertEqual(organization_class.id, "test-source-1:test-org-class")
 
@@ -347,7 +347,7 @@ class TestRestApiImporter(TestCase):
         data = {"id": 999, "name": "test-org-class"}
         organization_class = self.importer._import_organization_class(data)
         qs = OrganizationClass.objects.all()
-        self.assertQuerysetEqual(qs, [repr(organization_class)])
+        self.assertQuerysetEqual(qs, [organization_class])
         self.assertEqual(organization_class.name, "test-org-class")
         self.assertEqual(organization_class.id, "OpenDecisionAPI:999")
 
@@ -582,7 +582,7 @@ class TestTprekRestApiImporter(TestRestApiImporter):
             "class-with-no-source"
         )
         qs = OrganizationClass.objects.all()
-        self.assertQuerysetEqual(qs, [repr(organization_class)])
+        self.assertQuerysetEqual(qs, [organization_class])
         self.assertEqual(organization_class.id, "tprek:class-with-no-source")
         self.assertEqual(organization_class.name, "tprek:class-with-no-source")
 
@@ -596,7 +596,7 @@ class TestTprekRestApiImporter(TestRestApiImporter):
         )
 
         qs = OrganizationClass.objects.all()
-        self.assertQuerysetEqual(qs, [repr(organization_class)])
+        self.assertQuerysetEqual(qs, [organization_class])
         self.assertEqual(organization_class.id, "remapped:class-with-no-source")
         self.assertEqual(organization_class.name, "remapped:class-with-no-source")
 
@@ -636,7 +636,7 @@ class TestTprekRestApiImporter(TestRestApiImporter):
 
         self.assertQuerysetEqual(
             Organization.objects.all(),
-            [repr(default_parent), repr(organization)],
+            [default_parent, organization],
             ordered=False,
         )
         self.assertEqual(organization.name, "Organization-2")
@@ -651,7 +651,7 @@ class TestTprekRestApiImporter(TestRestApiImporter):
         # parent will have the default parent organization
         self.assertQuerysetEqual(
             qs,
-            [repr(default_parent), repr(organization.parent), repr(organization)],
+            [default_parent, organization.parent, organization],
             ordered=False,
         )
         self.assertEqual(organization.name, "Organization-1")
@@ -671,7 +671,7 @@ class TestTprekRestApiImporter(TestRestApiImporter):
         # also created parent organization.
         # parent was not found, so organization will have the default
         default_parent = Organization.objects.get(id="tprek:tprek")
-        self.assertQuerysetEqual(qs, [repr(default_parent), repr(organization)])
+        self.assertQuerysetEqual(qs, [default_parent, organization])
         self.assertEqual(organization.name, "Organization-3")
         self.assertEqual(organization.id, "tprek:333")
         self.assertEqual(
@@ -685,7 +685,7 @@ class TestTprekRestApiImporter(TestRestApiImporter):
         qs = Organization.objects.all()
         default_parent = Organization.objects.get(id="tprek:tprek")
         self.assertQuerysetEqual(
-            qs, [repr(default_parent), repr(organization)], ordered=False
+            qs, [default_parent, organization], ordered=False
         )
         self.assertEqual(organization.name, "Organization-2")
         self.assertEqual(organization.id, "tprek:222")
@@ -705,7 +705,7 @@ class TestTprekRestApiImporter(TestRestApiImporter):
         # parent will have the default parent organization
         self.assertQuerysetEqual(
             qs,
-            [repr(default_parent), repr(organization.parent), repr(organization)],
+            [default_parent, organization.parent, organization],
             ordered=False,
         )
         self.assertEqual(organization.name, "Organization-1")
@@ -730,7 +730,7 @@ class TestTprekRestApiImporter(TestRestApiImporter):
         # Now the parents should have switched.
         self.assertQuerysetEqual(
             qs,
-            [repr(default_parent), repr(organization.parent), repr(organization)],
+            [default_parent, organization.parent, organization],
             ordered=False,
         )
         self.assertEqual(organization.name, "Organization-2")
